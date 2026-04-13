@@ -37,10 +37,10 @@ export default async function ProviderDashboardPage() {
 
   const allBookings = user?.id ? await listProviderBookings(user.id) : [];
   const incoming = allBookings.filter((b) => b.status === "pending");
-  const confirmed = allBookings.filter(
+  const upcoming = allBookings.filter(
     (b) => b.status === "confirmed" || b.status === "in_progress"
   );
-  const confirmedCount = confirmed.filter((b) => b.status === "confirmed").length;
+  const confirmedCount = allBookings.filter((b) => b.status === "confirmed").length;
   const past = allBookings.filter((b) =>
     ["completed", "cancelled", "rejected"].includes(b.status)
   );
@@ -127,7 +127,7 @@ export default async function ProviderDashboardPage() {
             </CardHeader>
             <CardContent>
               <DashboardBookingList
-                items={confirmed}
+                items={upcoming}
                 mode="provider"
                 emptyLabel="No confirmed bookings."
               />

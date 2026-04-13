@@ -237,8 +237,7 @@ export async function updateBookingStatusAsProvider(
 
   const currentStatus = booking.status;
   const transitionAllowed =
-    (currentStatus === "confirmed" &&
-      (nextStatus === "in_progress" || nextStatus === "completed")) ||
+    (currentStatus === "confirmed" && nextStatus === "in_progress") ||
     (currentStatus === "in_progress" && nextStatus === "completed");
 
   if (!transitionAllowed) {
