@@ -92,10 +92,13 @@ export default async function CustomerDashboardPage() {
             <span className="font-medium text-foreground">Email:</span>{" "}
             {user?.email}
           </p>
-          <p className="flex flex-wrap items-center gap-2">
-            <span className="font-medium text-foreground">Role:</span>
-            <Badge variant="secondary">{getRoleFromUser(user)}</Badge>
-          </p>
+          <div className="flex flex-wrap items-center gap-2">
+  <span className="font-medium text-foreground">Role:</span>
+  <Badge variant="secondary">{getRoleFromUser(user)}</Badge>
+</div>
+            
+            
+          
           <Button asChild variant="link" className="h-auto px-0">
             <Link href="/settings">Open settings</Link>
           </Button>
