@@ -12,11 +12,20 @@ interface DashboardBookingListProps {
   emptyLabel: string;
 }
 
+// Length for showing "HH:MM" from stored "HH:MM:SS" time values.
 const DISPLAY_TIME_LENGTH = 5;
 
 function formatDate(date: string): string {
   const [year, month, day] = date.split("-").map(Number);
-  if (!year || !month || !day) return date;
+  if (
+    Number.isNaN(year) ||
+    Number.isNaN(month) ||
+    Number.isNaN(day) ||
+    month < 1 ||
+    day < 1
+  ) {
+    return date;
+  }
 
   return new Date(year, month - 1, day).toLocaleDateString(undefined, {
     weekday: "short",
