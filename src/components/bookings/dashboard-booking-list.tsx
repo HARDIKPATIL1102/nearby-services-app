@@ -22,6 +22,7 @@ function formatDate(date: string): string {
     Number.isNaN(month) ||
     Number.isNaN(day) ||
     month < 1 ||
+    month > 12 ||
     day < 1
   ) {
     return date;
