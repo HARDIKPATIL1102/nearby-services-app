@@ -35,16 +35,22 @@ export function DashboardBookingActions({
 
   async function onCancel() {
     setPending(true);
-    await cancelBookingForCustomer(bookingId);
-    setPending(false);
-    router.refresh();
+    try {
+      await cancelBookingForCustomer(bookingId);
+      router.refresh();
+    } finally {
+      setPending(false);
+    }
   }
 
   async function onRespond(decision: "confirmed" | "rejected") {
     setPending(true);
-    await respondToBookingAsProvider(bookingId, decision);
-    setPending(false);
-    router.refresh();
+    try {
+      await respondToBookingAsProvider(bookingId, decision);
+      router.refresh();
+    } finally {
+      setPending(false);
+    }
   }
 
   return (

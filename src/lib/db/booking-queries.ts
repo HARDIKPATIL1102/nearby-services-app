@@ -204,7 +204,7 @@ export async function listProviderBookings(
       ...(booking as BookingRow),
       provider_business_name: p?.business_name ?? null,
       service_title: svc?.title ?? null,
-      customer_name: r.users?.name?.trim() || null,
+      customer_name: r.users?.name?.trim() ?? null,
     };
   });
 }

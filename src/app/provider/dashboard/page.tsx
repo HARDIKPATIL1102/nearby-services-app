@@ -40,6 +40,7 @@ export default async function ProviderDashboardPage() {
   const confirmed = allBookings.filter(
     (b) => b.status === "confirmed" || b.status === "in_progress"
   );
+  const confirmedCount = confirmed.filter((b) => b.status === "confirmed").length;
   const recent = allBookings.filter((b) =>
     ["completed", "cancelled", "rejected"].includes(b.status)
   );
@@ -68,9 +69,7 @@ export default async function ProviderDashboardPage() {
         <Card>
           <CardHeader className="space-y-0 pb-2">
             <CardDescription>Confirmed count</CardDescription>
-            <CardTitle className="text-2xl">
-              {allBookings.filter((b) => b.status === "confirmed").length}
-            </CardTitle>
+            <CardTitle className="text-2xl">{confirmedCount}</CardTitle>
           </CardHeader>
         </Card>
         <Card>

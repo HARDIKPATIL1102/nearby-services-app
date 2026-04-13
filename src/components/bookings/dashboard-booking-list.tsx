@@ -12,13 +12,18 @@ interface DashboardBookingListProps {
   emptyLabel: string;
 }
 
+const NOON_TIME_FOR_LOCAL_DATE_RENDER = "12:00:00";
+
 function formatDate(date: string): string {
-  return new Date(`${date}T12:00:00`).toLocaleDateString(undefined, {
+  return new Date(`${date}T${NOON_TIME_FOR_LOCAL_DATE_RENDER}`).toLocaleDateString(
+    undefined,
+    {
     weekday: "short",
     month: "short",
     day: "numeric",
     year: "numeric",
-  });
+    }
+  );
 }
 
 function formatTime(time: string): string {
