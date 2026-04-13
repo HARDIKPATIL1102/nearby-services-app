@@ -197,3 +197,65 @@ export async function respondToBookingAsProvider(
   revalidatePath("/provider/dashboard");
   return {};
 }
+
+export async function updateBookingStatusAsProvider(
+  bookingId: string,
+  nextStatus: "in_progress" | "completed"
+): Promise<{ error?: string }> {
+  if (!isSupabaseConfigured()) {
+    return { error: "Supabase is not configured." };
+  }
+
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user || getRoleFromUser(user) !== "provider") {
+    return { error: "Unauthorized." };
+  }
+
+  const { data: booking, error: bErr } = await supabase
+    .from("bookings")
+    .select("id, provider_id, status")
+    .eq("id", bookingId)
+    .maybeSingle();
+
+  if (bErr || !booking) {
+    return { error: "Booking not found." };
+  }
+
+  const { data: prov, error: pErr } = await supabase
+    .from("providers")
+    .select("user_id")
+    .eq("id", booking.provider_id)
+    .maybeSingle();
+
+  if (pErr || !prov || prov.user_id !== user.id) {
+    return { error: "You cannot update this booking." };
+  }
+
+  const currentStatus = booking.status;
+  const transitionAllowed =
+    (currentStatus === "confirmed" &&
+      (nextStatus === "in_progress" || nextStatus === "completed")) ||
+    (currentStatus === "in_progress" && nextStatus === "completed");
+
+  if (!transitionAllowed) {
+    return { error: "This status update is not allowed." };
+  }
+
+  const { error: upErr } = await supabase
+    .from("bookings")
+    .update({ status: nextStatus })
+    .eq("id", bookingId);
+
+  if (upErr) {
+    return { error: upErr.message };
+  }
+
+  revalidatePath(`/bookings/${bookingId}`);
+  revalidatePath("/dashboard");
+  revalidatePath("/provider/dashboard");
+  return {};
+}

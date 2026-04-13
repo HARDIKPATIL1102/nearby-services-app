@@ -41,10 +41,11 @@ export default async function ProviderDashboardPage() {
     (b) => b.status === "confirmed" || b.status === "in_progress"
   );
   const confirmedCount = confirmed.filter((b) => b.status === "confirmed").length;
-  const recent = allBookings.filter((b) =>
+  const past = allBookings.filter((b) =>
     ["completed", "cancelled", "rejected"].includes(b.status)
   );
   const cancelledCount = allBookings.filter((b) => b.status === "cancelled").length;
+  const completedCount = allBookings.filter((b) => b.status === "completed").length;
 
   return (
     <div className="mx-auto max-w-4xl space-y-8 px-4 py-10 sm:px-6 sm:py-14">
@@ -59,23 +60,29 @@ export default async function ProviderDashboardPage() {
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="space-y-0 pb-2">
-            <CardDescription>Pending count</CardDescription>
+            <CardDescription>Incoming requests</CardDescription>
             <CardTitle className="text-2xl">{incoming.length}</CardTitle>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader className="space-y-0 pb-2">
-            <CardDescription>Confirmed count</CardDescription>
+            <CardDescription>Confirmed bookings</CardDescription>
             <CardTitle className="text-2xl">{confirmedCount}</CardTitle>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader className="space-y-0 pb-2">
-            <CardDescription>Cancelled count</CardDescription>
+            <CardDescription>Cancelled bookings</CardDescription>
             <CardTitle className="text-2xl">{cancelledCount}</CardTitle>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader className="space-y-0 pb-2">
+            <CardDescription>Completed bookings</CardDescription>
+            <CardTitle className="text-2xl">{completedCount}</CardTitle>
           </CardHeader>
         </Card>
       </div>
@@ -113,9 +120,9 @@ export default async function ProviderDashboardPage() {
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>Confirmed bookings</CardTitle>
+              <CardTitle>Upcoming bookings</CardTitle>
               <CardDescription>
-                Accepted bookings scheduled for service.
+                Confirmed and in-progress bookings to manage next.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -128,16 +135,16 @@ export default async function ProviderDashboardPage() {
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>Recent bookings</CardTitle>
+              <CardTitle>Past bookings</CardTitle>
               <CardDescription>
                 Completed, cancelled, and rejected bookings.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <DashboardBookingList
-                items={recent}
+                items={past}
                 mode="provider"
-                emptyLabel="No recent bookings."
+                emptyLabel="No past bookings."
               />
             </CardContent>
           </Card>
