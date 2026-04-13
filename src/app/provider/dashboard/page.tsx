@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { displayNameFromUser, getRoleFromUser } from "@/lib/auth/roles";
-import { BookingRows } from "@/components/bookings/booking-rows";
+import { ProviderBookingCard } from "@/components/bookings/provider-booking-card";
 import { listProviderBookings } from "@/lib/db/booking-queries";
 import { getUsersProfileById } from "@/lib/db/profile";
 import { isSupabaseConfigured } from "@/lib/env";
@@ -37,46 +37,103 @@ export default async function ProviderDashboardPage() {
 
   const allBookings = user?.id ? await listProviderBookings(user.id) : [];
   const incoming = allBookings.filter((b) => b.status === "pending");
-  const handled = allBookings.filter((b) => b.status !== "pending");
+  const confirmed = allBookings.filter(
+    (b) => b.status === "confirmed" || b.status === "in_progress"
+  );
+  const recent = allBookings.filter((b) =>
+    ["rejected", "completed", "cancelled"].includes(b.status)
+  );
+
+  const pendingCount = incoming.length;
+  const confirmedCount = confirmed.length;
+  const cancelledCount = allBookings.filter(
+    (b) => b.status === "cancelled" || b.status === "rejected"
+  ).length;
 
   return (
     <div className="mx-auto max-w-4xl space-y-8 px-4 py-10 sm:px-6 sm:py-14">
+      {/* Header */}
       <div>
         <p className="text-sm font-medium text-primary">Provider</p>
         <h1 className="mt-1 text-3xl font-bold tracking-tight">
           Welcome{name ? `, ${name}` : ""}
         </h1>
         <p className="mt-2 max-w-2xl text-muted-foreground">
-          Accept or decline new requests, then open a booking for full details.
-          Services and reviews management continues in Phase 6.
+          Manage incoming requests, accept jobs, and track your confirmed bookings.
         </p>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-4">
         <Card>
-          <CardHeader>
-            <CardTitle>Incoming requests</CardTitle>
-            <CardDescription>
-              Pending bookings need a response from you.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <BookingRows items={incoming} />
+          <CardContent className="pt-6 text-center">
+            <p className="text-3xl font-bold text-amber-600">{pendingCount}</p>
+            <p className="mt-1 text-sm text-muted-foreground">Pending</p>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader>
-            <CardTitle>Recent activity</CardTitle>
-            <CardDescription>
-              Confirmed, declined, and completed jobs.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <BookingRows items={handled} />
+          <CardContent className="pt-6 text-center">
+            <p className="text-3xl font-bold text-emerald-600">{confirmedCount}</p>
+            <p className="mt-1 text-sm text-muted-foreground">Confirmed</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6 text-center">
+            <p className="text-3xl font-bold text-muted-foreground">{cancelledCount}</p>
+            <p className="mt-1 text-sm text-muted-foreground">Declined</p>
           </CardContent>
         </Card>
       </div>
 
+      {/* Incoming requests */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold">Incoming requests</h2>
+        {incoming.length === 0 ? (
+          <Card>
+            <CardContent className="py-10 text-center">
+              <p className="text-muted-foreground">No pending requests right now.</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="space-y-3">
+            {incoming.map((b) => (
+              <ProviderBookingCard key={b.id} booking={b} />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Confirmed bookings */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold">Confirmed bookings</h2>
+        {confirmed.length === 0 ? (
+          <Card>
+            <CardContent className="py-10 text-center">
+              <p className="text-muted-foreground">No confirmed bookings yet.</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="space-y-3">
+            {confirmed.map((b) => (
+              <ProviderBookingCard key={b.id} booking={b} />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Recent activity */}
+      {recent.length > 0 ? (
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold">Recent activity</h2>
+          <div className="space-y-3">
+            {recent.map((b) => (
+              <ProviderBookingCard key={b.id} booking={b} />
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      {/* Business workspace */}
       <Card>
         <CardHeader>
           <CardTitle>Business workspace</CardTitle>

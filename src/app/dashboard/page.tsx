@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { displayNameFromUser, getRoleFromUser } from "@/lib/auth/roles";
-import { BookingRows } from "@/components/bookings/booking-rows";
+import { CustomerBookingCard } from "@/components/bookings/customer-booking-card";
 import { listCustomerBookings } from "@/lib/db/booking-queries";
 import { getUsersProfileById } from "@/lib/db/profile";
 import { isSupabaseConfigured } from "@/lib/env";
@@ -45,43 +45,84 @@ export default async function CustomerDashboardPage() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-8 px-4 py-10 sm:px-6 sm:py-14">
+      {/* Header */}
       <div>
         <p className="text-sm font-medium text-primary">Customer</p>
         <h1 className="mt-1 text-3xl font-bold tracking-tight">
           Hello{name ? `, ${name}` : ""}
         </h1>
         <p className="mt-2 max-w-2xl text-muted-foreground">
-          Track requests, confirmations, and history. Favorites and quick search
-          arrive in Phase 6.
+          Track your bookings, manage upcoming visits, and view your history.
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-4">
         <Card>
-          <CardHeader>
-            <CardTitle>Upcoming bookings</CardTitle>
-            <CardDescription>
-              Pending and confirmed visits you can open or cancel.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <BookingRows items={upcoming} />
-            <Button asChild variant="outline" size="sm">
-              <Link href="/services">Find a provider</Link>
-            </Button>
+          <CardContent className="pt-6 text-center">
+            <p className="text-3xl font-bold">{allBookings.length}</p>
+            <p className="mt-1 text-sm text-muted-foreground">Total</p>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader>
-            <CardTitle>Past bookings</CardTitle>
-            <CardDescription>Completed, cancelled, or declined.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <BookingRows items={past} />
+          <CardContent className="pt-6 text-center">
+            <p className="text-3xl font-bold text-amber-600">{upcoming.length}</p>
+            <p className="mt-1 text-sm text-muted-foreground">Upcoming</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6 text-center">
+            <p className="text-3xl font-bold text-muted-foreground">{past.length}</p>
+            <p className="mt-1 text-sm text-muted-foreground">Past</p>
           </CardContent>
         </Card>
       </div>
 
+      {/* Upcoming bookings */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-semibold">Upcoming bookings</h2>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/services">Find a provider</Link>
+          </Button>
+        </div>
+        {upcoming.length === 0 ? (
+          <Card>
+            <CardContent className="py-10 text-center">
+              <p className="text-muted-foreground">No upcoming bookings.</p>
+              <Button asChild className="mt-4" variant="outline" size="sm">
+                <Link href="/services">Browse services</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="space-y-3">
+            {upcoming.map((b) => (
+              <CustomerBookingCard key={b.id} booking={b} />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Past bookings */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold">Past bookings</h2>
+        {past.length === 0 ? (
+          <Card>
+            <CardContent className="py-10 text-center">
+              <p className="text-muted-foreground">No past bookings yet.</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="space-y-3">
+            {past.map((b) => (
+              <CustomerBookingCard key={b.id} booking={b} />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Account */}
       <Card>
         <CardHeader>
           <CardTitle>Account</CardTitle>

@@ -7,6 +7,7 @@ export type BookingRow = TableRow<"bookings">;
 export interface BookingListItem extends BookingRow {
   provider_business_name: string | null;
   service_title: string | null;
+  customer_name: string | null;
 }
 
 export interface BookingDetail {
@@ -150,6 +151,7 @@ export async function listCustomerBookings(
       ...(booking as BookingRow),
       provider_business_name: prov?.business_name ?? null,
       service_title: svc?.title ?? null,
+      customer_name: null,
     };
   });
 }
@@ -175,7 +177,8 @@ export async function listProviderBookings(
       `
       *,
       providers ( business_name ),
-      services ( title )
+      services ( title ),
+      users!customer_id ( name )
     `
     )
     .eq("provider_id", prov.id)
@@ -190,16 +193,19 @@ export async function listProviderBookings(
     const r = row as BookingRow & {
       providers: { business_name: string } | null;
       services: { title: string } | null;
+      users: { name: string } | null;
     };
     const {
       providers: p,
       services: svc,
+      users: cust,
       ...booking
     } = r;
     return {
       ...(booking as BookingRow),
       provider_business_name: p?.business_name ?? null,
       service_title: svc?.title ?? null,
+      customer_name: cust?.name?.trim() || null,
     };
   });
 }
