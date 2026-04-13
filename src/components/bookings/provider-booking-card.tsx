@@ -6,48 +6,15 @@ import { useRouter } from "next/navigation";
 
 import { respondToBookingAsProvider } from "@/app/bookings/actions";
 import type { BookingListItem } from "@/lib/db/booking-queries";
-import type { BookingStatus } from "@/types/bookings";
-
-function statusLabel(status: BookingStatus | string): string {
-  switch (status) {
-    case "pending": return "Pending";
-    case "confirmed": return "Confirmed";
-    case "rejected": return "Rejected";
-    case "in_progress": return "In progress";
-    case "completed": return "Completed";
-    case "cancelled": return "Cancelled";
-    default: return status;
-  }
-}
-
-function statusBadgeVariant(
-  status: BookingStatus | string
-): "default" | "secondary" | "destructive" | "outline" | "success" | "warning" | "muted" {
-  switch (status) {
-    case "pending": return "warning";
-    case "confirmed": return "success";
-    case "rejected": return "destructive";
-    case "in_progress": return "default";
-    case "completed": return "secondary";
-    case "cancelled": return "muted";
-    default: return "outline";
-  }
-}
+import {
+  statusLabel,
+  statusBadgeVariant,
+  formatBookingDate,
+  formatBookingTime,
+} from "@/lib/booking-utils";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-
-function formatDate(d: string): string {
-  return new Date(`${d}T12:00:00`).toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
-function formatTime(t: string): string {
-  return t.length >= 5 ? t.slice(0, 5) : t;
-}
 
 interface ProviderBookingCardProps {
   booking: BookingListItem;
@@ -91,11 +58,11 @@ export function ProviderBookingCard({ booking: b }: ProviderBookingCardProps) {
       <dl className="grid grid-cols-1 gap-1 text-sm sm:grid-cols-2">
         <div>
           <dt className="text-muted-foreground inline">Date: </dt>
-          <dd className="font-medium inline">{formatDate(b.booking_date)}</dd>
+          <dd className="font-medium inline">{formatBookingDate(b.booking_date)}</dd>
         </div>
         <div>
           <dt className="text-muted-foreground inline">Time: </dt>
-          <dd className="font-medium inline">{formatTime(b.booking_time)}</dd>
+          <dd className="font-medium inline">{formatBookingTime(b.booking_time)}</dd>
         </div>
         <div className="sm:col-span-2">
           <dt className="text-muted-foreground inline">Address: </dt>

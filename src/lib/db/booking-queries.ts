@@ -1,6 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 import type { TableRow } from "@/types/database";
 import type { BookingStatus } from "@/types/bookings";
+import {
+  statusLabel,
+  statusBadgeVariant,
+} from "@/lib/booking-utils";
+
+export { statusLabel, statusBadgeVariant };
 
 export type BookingRow = TableRow<"bookings">;
 
@@ -208,51 +214,4 @@ export async function listProviderBookings(
       customer_name: cust?.name?.trim() || null,
     };
   });
-}
-
-export function statusLabel(status: BookingStatus | string): string {
-  switch (status) {
-    case "pending":
-      return "Pending";
-    case "confirmed":
-      return "Confirmed";
-    case "rejected":
-      return "Rejected";
-    case "in_progress":
-      return "In progress";
-    case "completed":
-      return "Completed";
-    case "cancelled":
-      return "Cancelled";
-    default:
-      return status;
-  }
-}
-
-export function statusBadgeVariant(
-  status: BookingStatus | string
-):
-  | "default"
-  | "secondary"
-  | "destructive"
-  | "outline"
-  | "success"
-  | "warning"
-  | "muted" {
-  switch (status) {
-    case "pending":
-      return "warning";
-    case "confirmed":
-      return "success";
-    case "rejected":
-      return "destructive";
-    case "in_progress":
-      return "default";
-    case "completed":
-      return "secondary";
-    case "cancelled":
-      return "muted";
-    default:
-      return "outline";
-  }
 }
