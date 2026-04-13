@@ -12,22 +12,24 @@ interface DashboardBookingListProps {
   emptyLabel: string;
 }
 
-const NOON_TIME_FOR_LOCAL_DATE_RENDER = "12:00:00";
+const DISPLAY_TIME_LENGTH = 5;
 
 function formatDate(date: string): string {
-  return new Date(`${date}T${NOON_TIME_FOR_LOCAL_DATE_RENDER}`).toLocaleDateString(
-    undefined,
-    {
+  const [year, month, day] = date.split("-").map(Number);
+  if (!year || !month || !day) return date;
+
+  return new Date(year, month - 1, day).toLocaleDateString(undefined, {
     weekday: "short",
     month: "short",
     day: "numeric",
     year: "numeric",
-    }
-  );
+  });
 }
 
 function formatTime(time: string): string {
-  return time.length >= 5 ? time.slice(0, 5) : time;
+  return time.length >= DISPLAY_TIME_LENGTH
+    ? time.slice(0, DISPLAY_TIME_LENGTH)
+    : time;
 }
 
 export function DashboardBookingList({
