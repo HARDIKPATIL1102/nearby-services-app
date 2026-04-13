@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { displayNameFromUser, getRoleFromUser } from "@/lib/auth/roles";
-import { BookingRows } from "@/components/bookings/booking-rows";
+import { DashboardBookingList } from "@/components/bookings/dashboard-booking-list";
 import { listCustomerBookings } from "@/lib/db/booking-queries";
 import { getUsersProfileById } from "@/lib/db/profile";
 import { isSupabaseConfigured } from "@/lib/env";
@@ -42,6 +42,7 @@ export default async function CustomerDashboardPage() {
   const past = allBookings.filter(
     (b) => !["pending", "confirmed", "in_progress"].includes(b.status)
   );
+  const cancelled = allBookings.filter((b) => b.status === "cancelled");
 
   return (
     <div className="mx-auto max-w-4xl space-y-8 px-4 py-10 sm:px-6 sm:py-14">
@@ -51,36 +52,81 @@ export default async function CustomerDashboardPage() {
           Hello{name ? `, ${name}` : ""}
         </h1>
         <p className="mt-2 max-w-2xl text-muted-foreground">
-          Track requests, confirmations, and history. Favorites and quick search
-          arrive in Phase 6.
+          Track upcoming and past bookings, open details, and cancel requests when
+          allowed.
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-3">
+        <Card>
+          <CardHeader className="space-y-0 pb-2">
+            <CardDescription>Total bookings</CardDescription>
+            <CardTitle className="text-2xl">{allBookings.length}</CardTitle>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader className="space-y-0 pb-2">
+            <CardDescription>Upcoming</CardDescription>
+            <CardTitle className="text-2xl">{upcoming.length}</CardTitle>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader className="space-y-0 pb-2">
+            <CardDescription>Cancelled</CardDescription>
+            <CardTitle className="text-2xl">{cancelled.length}</CardTitle>
+          </CardHeader>
+        </Card>
+      </div>
+
+      {!allBookings.length ? (
         <Card>
           <CardHeader>
-            <CardTitle>Upcoming bookings</CardTitle>
+            <CardTitle>No bookings yet</CardTitle>
             <CardDescription>
-              Pending and confirmed visits you can open or cancel.
+              You haven&apos;t booked any service yet. Explore providers to book
+              your first service.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <BookingRows items={upcoming} />
-            <Button asChild variant="outline" size="sm">
+          <CardContent>
+            <Button asChild>
               <Link href="/services">Find a provider</Link>
             </Button>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Past bookings</CardTitle>
-            <CardDescription>Completed, cancelled, or declined.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <BookingRows items={past} />
-          </CardContent>
-        </Card>
-      </div>
+      ) : (
+        <div className="grid gap-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Upcoming bookings</CardTitle>
+              <CardDescription>
+                Pending, confirmed, and in-progress visits.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <DashboardBookingList
+                items={upcoming}
+                mode="customer"
+                emptyLabel="No upcoming bookings."
+              />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Past bookings</CardTitle>
+              <CardDescription>
+                Completed, cancelled, and rejected requests.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <DashboardBookingList
+                items={past}
+                mode="customer"
+                emptyLabel="No past bookings yet."
+              />
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       <Card>
         <CardHeader>
